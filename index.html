@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>가맹점 손익 보고 시스템</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700&display=swap');
+        body { font-family: 'Pretendard', sans-serif; background-color: #f2f4f6; color: #191f28; }
+        .step-container { display: none; min-height: 70vh; }
+        .step-container.active { display: flex; flex-direction: column; justify-content: center; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: translateX(0); } }
+        .toss-input { font-size: 1.5rem; border: none; border-bottom: 2px solid #e5e8eb; width: 100%; padding: 10px 0; background: transparent; }
+        .toss-input:focus { outline: none; border-bottom: 2px solid #3182f6; }
+        .btn-next { background-color: #3182f6; color: white; padding: 16px; border-radius: 12px; font-weight: 600; width: 100%; }
+        #capture-result { background: white; border-radius: 20px; padding: 24px; display: none; }
+    </style>
+</head>
+<body class="p-6">
+
+    <div id="survey-flow">
+        <div class="step-container active" id="step-0">
+            <h1 class="text-2xl font-bold mb-8">매장 이름과<br>보고 월을 확인해주세요</h1>
+            <input type="text" id="storeName" class="toss-input mb-4" placeholder="매장명">
+            <select id="reportMonth" class="toss-input mb-8 text-lg">
+                <option value="2월">2월</option>
+                <option value="3월">3월</option>
+                <option value="4월">4월</option>
+            </select>
+            <button class="btn-next" onclick="nextStep(0)">시작하기</button>
+        </div>
+
+        <div class="step-container" id="step-1"><h1 class="text-2xl font-bold mb-8">식자재(야채)<br>비용 입력</h1><input type="number" id="cost_veg" class="toss-input mb-8" placeholder="0"><button class="btn-next" onclick="nextStep(1)">다음</button></div>
+        <div class="step-container" id="step-2"><h1 class="text-2xl font-bold mb-8">식자재(쌀, 계란)<br>비용 입력</h1><input type="number" id="cost_rice" class="toss-input mb-8" placeholder="0"><button class="btn-next" onclick="nextStep(2)">다음</button></div>
+        <div class="step-container" id="step-3"><h1 class="text-2xl font-bold mb-8">주류 및 음료<br>비용 입력</h1><input type="number" id="cost_drink" class="toss-input mb-8" placeholder="0"><button class="btn-next" onclick="nextStep(3)">다음</button></div>
+        <div class="step-container" id="step-4"><h1 class="text-2xl font-bold mb-8">공과금 합계<br>(전기/가스/수도)</h1><input type="number" id="util_total" class="toss-input mb-8" placeholder="0"><button class="btn-next" onclick="nextStep(4)">다음</button></div>
+        <div class="step-container" id="step-5"><h1 class="text-2xl font-bold mb-8">기타 관리비<br>(처리비/임차료/관리비)</h1><input type="number" id="mgt_total" class="toss-input mb-8" placeholder="0"><button class="btn-next" onclick="nextStep(5)">다음</button></div>
+        <div class="step-container" id="step-6">
+            <h1 class="text-2xl font-bold mb-4">인건비 및 인원</h1>
+            <input type="number" id="labor_kitchen" class="toss-input mb-2" placeholder="주방 인건비">
+            <input type="number" id="labor_hall" class="toss-input mb-2" placeholder="홀 인건비">
+            <input type="number" id="labor_count" class="toss-input mb-8" placeholder="총 근무인원">
+            <button class="btn-next" onclick="showResult()">리포트 생성</button>
+        </div>
+    </div>
+
+    <div id="capture-result" class="shadow-xl">
+        <h2 id="res_title" class="text-xl font-bold text-blue-600 mb-4">손익 보고서</h2>
+        <div class="space-y-2 text-sm">
+            <div class="flex justify-between"><span>식자재(야채/쌀/계란/주류)</span><span id="res_food">0원</span></div>
+            <div class="flex justify-between"><span>공과금</span><span id="res_util">0원</span></div>
+            <div class="flex justify-between"><span>임차료 및 관리비</span><span id="res_mgt">0원</span></div>
+            <div class="flex justify-between font-bold"><span>인건비 (인원: <span id="res_count">0</span>명)</span><span id="res_labor">0원</span></div>
+            <div class="border-t pt-2 mt-2 flex justify-between font-bold text-lg"><span>지출 합계</span><span id="res_total">0원</span></div>
+        </div>
+    </div>
+    <button id="btn-save" class="btn-next mt-6 hidden" style="background-color: #191f28;" onclick="downloadImg()">이미지로 저장하기</button>
+
+    <script>
+        function nextStep(step) {
+            document.getElementById(`step-${step}`).classList.remove('active');
+            document.getElementById(`step-${step+1}`).classList.add('active');
+        }
+        function formatWon(val) { return Number(val).toLocaleString() + '원'; }
+        
+        function showResult() {
+            const food = Number(document.getElementById('cost_veg').value) + Number(document.getElementById('cost_rice').value) + Number(document.getElementById('cost_drink').value);
+            const util = Number(document.getElementById('util_total').value);
+            const mgt = Number(document.getElementById('mgt_total').value);
+            const labor = Number(document.getElementById('labor_kitchen').value) + Number(document.getElementById('labor_hall').value);
+            const total = food + util + mgt + labor;
+
+            document.getElementById('res_title').innerText = `${document.getElementById('storeName').value} ${document.getElementById('reportMonth').value} 손익`;
+            document.getElementById('res_food').innerText = formatWon(food);
+            document.getElementById('res_util').innerText = formatWon(util);
+            document.getElementById('res_mgt').innerText = formatWon(mgt);
+            document.getElementById('res_labor').innerText = formatWon(labor);
+            document.getElementById('res_count').innerText = document.getElementById('labor_count').value;
+            document.getElementById('res_total').innerText = formatWon(total);
+
+            document.getElementById('survey-flow').style.display = 'none';
+            document.getElementById('capture-result').style.display = 'block';
+            document.getElementById('btn-save').classList.remove('hidden');
+        }
+
+        function downloadImg() {
+            html2canvas(document.getElementById('capture-result')).then(canvas => {
+                const link = document.createElement('a');
+                link.download = '손익보고.png';
+                link.href = canvas.toDataURL();
+                link.click();
+            });
+        }
+    </script>
+</body>
+</html>
