@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>가맹점 손익 보고 시스템</title>
+    <title>매장 운영 현황 공유</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
@@ -22,32 +22,38 @@
 
     <div id="survey-flow">
         <div class="step-container active" id="step-0">
-            <h1 class="text-2xl font-bold mb-8">매장 이름과<br>보고 월을 확인해주세요</h1>
-            <input type="text" id="storeName" class="toss-input mb-4" placeholder="매장명">
+            <h1 class="text-2xl font-bold mb-4">매장 운영 현황 공유</h1>
+            <p class="text-gray-600 mb-8 leading-relaxed">
+                점주님, 안녕하세요!<br>
+                매출은 본사에서 파악 중이니,<br>
+                지출 내역만 간편하게 공유 부탁드립니다.<br><br>
+                바쁘신 와중에도 협조해주셔서 늘 감사합니다.
+            </p>
+            <input type="text" id="storeName" class="toss-input mb-4" placeholder="매장명을 입력해주세요">
             <select id="reportMonth" class="toss-input mb-8 text-lg">
                 <option value="2월">2월</option>
                 <option value="3월">3월</option>
                 <option value="4월">4월</option>
             </select>
-            <button class="btn-next" onclick="nextStep(0)">시작하기</button>
+            <button class="btn-next" onclick="nextStep(0)">현황 입력 시작하기</button>
         </div>
 
-        <div class="step-container" id="step-1"><h1 class="text-2xl font-bold mb-8">식자재(야채)<br>비용 입력</h1><input type="number" id="cost_veg" class="toss-input mb-8" placeholder="0"><button class="btn-next" onclick="nextStep(1)">다음</button></div>
-        <div class="step-container" id="step-2"><h1 class="text-2xl font-bold mb-8">식자재(쌀, 계란)<br>비용 입력</h1><input type="number" id="cost_rice" class="toss-input mb-8" placeholder="0"><button class="btn-next" onclick="nextStep(2)">다음</button></div>
-        <div class="step-container" id="step-3"><h1 class="text-2xl font-bold mb-8">주류 및 음료<br>비용 입력</h1><input type="number" id="cost_drink" class="toss-input mb-8" placeholder="0"><button class="btn-next" onclick="nextStep(3)">다음</button></div>
+        <div class="step-container" id="step-1"><h1 class="text-2xl font-bold mb-8">식자재(야채)<br>비용을 입력해주세요</h1><input type="number" id="cost_veg" class="toss-input mb-8" placeholder="0"><button class="btn-next" onclick="nextStep(1)">다음</button></div>
+        <div class="step-container" id="step-2"><h1 class="text-2xl font-bold mb-8">식자재(쌀, 계란)<br>비용을 입력해주세요</h1><input type="number" id="cost_rice" class="toss-input mb-8" placeholder="0"><button class="btn-next" onclick="nextStep(2)">다음</button></div>
+        <div class="step-container" id="step-3"><h1 class="text-2xl font-bold mb-8">주류 및 음료<br>비용을 입력해주세요</h1><input type="number" id="cost_drink" class="toss-input mb-8" placeholder="0"><button class="btn-next" onclick="nextStep(3)">다음</button></div>
         <div class="step-container" id="step-4"><h1 class="text-2xl font-bold mb-8">공과금 합계<br>(전기/가스/수도)</h1><input type="number" id="util_total" class="toss-input mb-8" placeholder="0"><button class="btn-next" onclick="nextStep(4)">다음</button></div>
-        <div class="step-container" id="step-5"><h1 class="text-2xl font-bold mb-8">기타 관리비<br>(처리비/임차료/관리비)</h1><input type="number" id="mgt_total" class="toss-input mb-8" placeholder="0"><button class="btn-next" onclick="nextStep(5)">다음</button></div>
+        <div class="step-container" id="step-5"><h1 class="text-2xl font-bold mb-8">관리비 합계<br>(처리비/임차료/기타)</h1><input type="number" id="mgt_total" class="toss-input mb-8" placeholder="0"><button class="btn-next" onclick="nextStep(5)">다음</button></div>
         <div class="step-container" id="step-6">
-            <h1 class="text-2xl font-bold mb-4">인건비 및 인원</h1>
+            <h1 class="text-2xl font-bold mb-4">마지막으로<br>인건비 및 인원을 알려주세요</h1>
             <input type="number" id="labor_kitchen" class="toss-input mb-2" placeholder="주방 인건비">
             <input type="number" id="labor_hall" class="toss-input mb-2" placeholder="홀 인건비">
-            <input type="number" id="labor_count" class="toss-input mb-8" placeholder="총 근무인원">
-            <button class="btn-next" onclick="showResult()">리포트 생성</button>
+            <input type="number" id="labor_count" class="toss-input mb-8" placeholder="총 근무인원 수">
+            <button class="btn-next" onclick="showResult()">데이터 정리하기</button>
         </div>
     </div>
 
     <div id="capture-result" class="shadow-xl">
-        <h2 id="res_title" class="text-xl font-bold text-blue-600 mb-4">손익 보고서</h2>
+        <h2 id="res_title" class="text-xl font-bold text-blue-600 mb-4">운영 현황 내역</h2>
         <div class="space-y-2 text-sm">
             <div class="flex justify-between"><span>식자재(야채/쌀/계란/주류)</span><span id="res_food">0원</span></div>
             <div class="flex justify-between"><span>공과금</span><span id="res_util">0원</span></div>
@@ -56,7 +62,7 @@
             <div class="border-t pt-2 mt-2 flex justify-between font-bold text-lg"><span>지출 합계</span><span id="res_total">0원</span></div>
         </div>
     </div>
-    <button id="btn-save" class="btn-next mt-6 hidden" style="background-color: #191f28;" onclick="downloadImg()">이미지로 저장하기</button>
+    <button id="btn-save" class="btn-next mt-6 hidden" style="background-color: #191f28;" onclick="downloadImg()">이미지로 저장하여 전송하기</button>
 
     <script>
         function nextStep(step) {
@@ -72,7 +78,7 @@
             const labor = Number(document.getElementById('labor_kitchen').value) + Number(document.getElementById('labor_hall').value);
             const total = food + util + mgt + labor;
 
-            document.getElementById('res_title').innerText = `${document.getElementById('storeName').value} ${document.getElementById('reportMonth').value} 손익`;
+            document.getElementById('res_title').innerText = `${document.getElementById('storeName').value} ${document.getElementById('reportMonth').value} 운영 현황`;
             document.getElementById('res_food').innerText = formatWon(food);
             document.getElementById('res_util').innerText = formatWon(util);
             document.getElementById('res_mgt').innerText = formatWon(mgt);
@@ -88,7 +94,7 @@
         function downloadImg() {
             html2canvas(document.getElementById('capture-result')).then(canvas => {
                 const link = document.createElement('a');
-                link.download = '손익보고.png';
+                link.download = `${document.getElementById('storeName').value}_운영현황.png`;
                 link.href = canvas.toDataURL();
                 link.click();
             });
