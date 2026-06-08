@@ -11,11 +11,11 @@
         body { font-family: 'Pretendard', sans-serif; background-color: #f2f4f6; color: #191f28; }
         .step-container { display: none; min-height: 70vh; }
         .step-container.active { display: flex; flex-direction: column; justify-content: center; animation: fadeIn 0.3s; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: translateX(0); } }
         .toss-input { font-size: 1.5rem; border: none; border-bottom: 2px solid #e5e8eb; width: 100%; padding: 10px 0; background: transparent; }
         .toss-input:focus { outline: none; border-bottom: 2px solid #3182f6; }
         .btn-next { background-color: #3182f6; color: white; padding: 16px; border-radius: 12px; font-weight: 600; width: 100%; }
         #capture-result { background: white; border-radius: 20px; padding: 24px; display: none; }
+        .korean-number { font-size: 0.85rem; color: #3182f6; margin-top: 5px; min-height: 20px; }
     </style>
 </head>
 <body class="p-6">
@@ -23,44 +23,64 @@
     <div id="survey-flow">
         <div class="step-container active" id="step-0">
             <h1 class="text-2xl font-bold mb-4">매장 운영 현황 공유</h1>
-            <p class="text-gray-600 mb-8 leading-relaxed">
-                점주님, 안녕하세요!<br>
-                매출은 본사에서 파악 중이니,<br>
-                지출 내역만 간편하게 공유 부탁드립니다.<br><br>
-                바쁘신 와중에도 협조해주셔서 늘 감사합니다.
-            </p>
+            <p class="text-gray-600 mb-8">지출 내역을 공유해주시면 매장 운영 효율을 함께 고민해 보겠습니다. 감사합니다.</p>
             <input type="text" id="storeName" class="toss-input mb-4" placeholder="매장명을 입력해주세요">
             <select id="reportMonth" class="toss-input mb-8 text-lg">
-                <option value="2월">2월</option>
-                <option value="3월">3월</option>
-                <option value="4월">4월</option>
+                <script>
+                    for(let i=1; i<=12; i++) document.write(`<option value="${i}월">${i}월</option>`);
+                </script>
             </select>
-            <button class="btn-next" onclick="nextStep(0)">현황 입력 시작하기</button>
+            <button class="btn-next" onclick="nextStep(0)">시작하기</button>
         </div>
 
-        <div class="step-container" id="step-1"><h1 class="text-2xl font-bold mb-8">식자재(야채)<br>비용을 입력해주세요</h1><input type="number" id="cost_veg" class="toss-input mb-8" placeholder="0"><button class="btn-next" onclick="nextStep(1)">다음</button></div>
-        <div class="step-container" id="step-2"><h1 class="text-2xl font-bold mb-8">식자재(쌀, 계란)<br>비용을 입력해주세요</h1><input type="number" id="cost_rice" class="toss-input mb-8" placeholder="0"><button class="btn-next" onclick="nextStep(2)">다음</button></div>
-        <div class="step-container" id="step-3"><h1 class="text-2xl font-bold mb-8">주류 및 음료<br>비용을 입력해주세요</h1><input type="number" id="cost_drink" class="toss-input mb-8" placeholder="0"><button class="btn-next" onclick="nextStep(3)">다음</button></div>
-        <div class="step-container" id="step-4"><h1 class="text-2xl font-bold mb-8">공과금 합계<br>(전기/가스/수도)</h1><input type="number" id="util_total" class="toss-input mb-8" placeholder="0"><button class="btn-next" onclick="nextStep(4)">다음</button></div>
-        <div class="step-container" id="step-5"><h1 class="text-2xl font-bold mb-8">관리비 합계<br>(처리비/임차료/기타)</h1><input type="number" id="mgt_total" class="toss-input mb-8" placeholder="0"><button class="btn-next" onclick="nextStep(5)">다음</button></div>
-        <div class="step-container" id="step-6">
-            <h1 class="text-2xl font-bold mb-4">마지막으로<br>인건비 및 인원을 알려주세요</h1>
-            <input type="number" id="labor_kitchen" class="toss-input mb-2" placeholder="주방 인건비">
-            <input type="number" id="labor_hall" class="toss-input mb-2" placeholder="홀 인건비">
-            <input type="number" id="labor_count" class="toss-input mb-8" placeholder="총 근무인원 수">
-            <button class="btn-next" onclick="showResult()">데이터 정리하기</button>
+        <div class="step-container" id="step-1">
+            <h1 class="text-2xl font-bold mb-2">야채 / 쌀,계란 / 주류음료</h1>
+            <input type="number" id="veg" class="toss-input" placeholder="야채" oninput="showKorean(this)">
+            <div id="veg-kor" class="korean-number"></div>
+            <input type="number" id="rice" class="toss-input mt-4" placeholder="쌀, 계란" oninput="showKorean(this)">
+            <div id="rice-kor" class="korean-number"></div>
+            <input type="number" id="drink" class="toss-input mt-4" placeholder="주류, 음료" oninput="showKorean(this)">
+            <div id="drink-kor" class="korean-number"></div>
+            <button class="btn-next mt-6" onclick="nextStep(1)">다음</button>
+        </div>
+
+        <div class="step-container" id="step-2">
+            <h1 class="text-2xl font-bold mb-2">공과금</h1>
+            <input type="number" id="elec" class="toss-input" placeholder="전기요금" oninput="showKorean(this)">
+            <div id="elec-kor" class="korean-number"></div>
+            <input type="number" id="gas" class="toss-input mt-4" placeholder="가스요금" oninput="showKorean(this)">
+            <div id="gas-kor" class="korean-number"></div>
+            <input type="number" id="water" class="toss-input mt-4" placeholder="수도요금" oninput="showKorean(this)">
+            <div id="water-kor" class="korean-number"></div>
+            <button class="btn-next mt-6" onclick="nextStep(2)">다음</button>
+        </div>
+
+        <div class="step-container" id="step-3">
+            <h1 class="text-2xl font-bold mb-2">운영 관리비</h1>
+            <input type="number" id="waste" class="toss-input" placeholder="음식물처리비" oninput="showKorean(this)">
+            <div id="waste-kor" class="korean-number"></div>
+            <input type="number" id="rent" class="toss-input mt-4" placeholder="임차료" oninput="showKorean(this)">
+            <div id="rent-kor" class="korean-number"></div>
+            <input type="number" id="mgt" class="toss-input mt-4" placeholder="기타 관리비" oninput="showKorean(this)">
+            <div id="mgt-kor" class="korean-number"></div>
+            <button class="btn-next mt-6" onclick="nextStep(3)">다음</button>
+        </div>
+
+        <div class="step-container" id="step-4">
+            <h1 class="text-2xl font-bold mb-2">인건비 및 인원</h1>
+            <input type="number" id="in_kitchen" class="toss-input" placeholder="주방 인건비" oninput="showKorean(this)">
+            <div id="in_kitchen-kor" class="korean-number"></div>
+            <input type="number" id="in_hall" class="toss-input mt-4" placeholder="홀 인건비" oninput="showKorean(this)">
+            <div id="in_hall-kor" class="korean-number"></div>
+            <input type="number" id="cnt" class="toss-input mt-4" placeholder="총 근무인원">
+            <button class="btn-next mt-6" onclick="showResult()">데이터 정리 완료</button>
         </div>
     </div>
 
     <div id="capture-result" class="shadow-xl">
-        <h2 id="res_title" class="text-xl font-bold text-blue-600 mb-4">운영 현황 내역</h2>
-        <div class="space-y-2 text-sm">
-            <div class="flex justify-between"><span>식자재(야채/쌀/계란/주류)</span><span id="res_food">0원</span></div>
-            <div class="flex justify-between"><span>공과금</span><span id="res_util">0원</span></div>
-            <div class="flex justify-between"><span>임차료 및 관리비</span><span id="res_mgt">0원</span></div>
-            <div class="flex justify-between font-bold"><span>인건비 (인원: <span id="res_count">0</span>명)</span><span id="res_labor">0원</span></div>
-            <div class="border-t pt-2 mt-2 flex justify-between font-bold text-lg"><span>지출 합계</span><span id="res_total">0원</span></div>
-        </div>
+        <h2 id="res_title" class="text-xl font-bold text-blue-600 mb-4">매장 운영 현황</h2>
+        <div id="res_list" class="space-y-1 text-sm"></div>
+        <div class="border-t mt-4 pt-2 font-bold text-lg flex justify-between"><span>총 지출 합계</span><span id="res_total"></span></div>
     </div>
     <button id="btn-save" class="btn-next mt-6 hidden" style="background-color: #191f28;" onclick="downloadImg()">이미지로 저장하여 전송하기</button>
 
@@ -69,23 +89,53 @@
             document.getElementById(`step-${step}`).classList.remove('active');
             document.getElementById(`step-${step+1}`).classList.add('active');
         }
-        function formatWon(val) { return Number(val).toLocaleString() + '원'; }
-        
+
+        function showKorean(el) {
+            const val = el.value;
+            const target = document.getElementById(el.id + '-kor');
+            if(!val) { target.innerText = ""; return; }
+            
+            const units = ["", "만", "억", "조"];
+            const nums = ["", "일", "이", "삼", "사", "오", "육", "칠", "팔", "구"];
+            const decimal = ["", "십", "백", "천"];
+            let s = val.toString();
+            let result = "";
+            let unitIdx = 0;
+            
+            for(let i=0; i<s.length; i+=4) {
+                let part = s.slice(Math.max(0, s.length-i-4), s.length-i);
+                let subResult = "";
+                for(let j=0; j<part.length; j++) {
+                    let n = parseInt(part[part.length-1-j]);
+                    if(n > 0) subResult = nums[n] + decimal[j] + subResult;
+                }
+                if(subResult) result = subResult + units[unitIdx] + result;
+                unitIdx++;
+            }
+            target.innerText = result ? result + "원" : "";
+        }
+
         function showResult() {
-            const food = Number(document.getElementById('cost_veg').value) + Number(document.getElementById('cost_rice').value) + Number(document.getElementById('cost_drink').value);
-            const util = Number(document.getElementById('util_total').value);
-            const mgt = Number(document.getElementById('mgt_total').value);
-            const labor = Number(document.getElementById('labor_kitchen').value) + Number(document.getElementById('labor_hall').value);
-            const total = food + util + mgt + labor;
-
+            const fields = [
+                { id: 'veg', label: '야채' }, { id: 'rice', label: '쌀/계란' }, { id: 'drink', label: '주류/음료' },
+                { id: 'elec', label: '전기요금' }, { id: 'gas', label: '가스요금' }, { id: 'water', label: '수도요금' },
+                { id: 'waste', label: '음식물처리비' }, { id: 'rent', label: '임차료' }, { id: 'mgt', label: '기타 관리비' },
+                { id: 'in_kitchen', label: '주방 인건비' }, { id: 'in_hall', label: '홀 인건비' }
+            ];
+            
+            let total = 0;
+            let html = '';
+            fields.forEach(f => {
+                let val = Number(document.getElementById(f.id).value);
+                total += val;
+                html += `<div class="flex justify-between"><span>${f.label}</span><span>${val.toLocaleString()}원</span></div>`;
+            });
+            html += `<div class="flex justify-between mt-2 font-semibold"><span>근무 인원</span><span>${document.getElementById('cnt').value}명</span></div>`;
+            
             document.getElementById('res_title').innerText = `${document.getElementById('storeName').value} ${document.getElementById('reportMonth').value} 운영 현황`;
-            document.getElementById('res_food').innerText = formatWon(food);
-            document.getElementById('res_util').innerText = formatWon(util);
-            document.getElementById('res_mgt').innerText = formatWon(mgt);
-            document.getElementById('res_labor').innerText = formatWon(labor);
-            document.getElementById('res_count').innerText = document.getElementById('labor_count').value;
-            document.getElementById('res_total').innerText = formatWon(total);
-
+            document.getElementById('res_list').innerHTML = html;
+            document.getElementById('res_total').innerText = total.toLocaleString() + '원';
+            
             document.getElementById('survey-flow').style.display = 'none';
             document.getElementById('capture-result').style.display = 'block';
             document.getElementById('btn-save').classList.remove('hidden');
@@ -94,7 +144,7 @@
         function downloadImg() {
             html2canvas(document.getElementById('capture-result')).then(canvas => {
                 const link = document.createElement('a');
-                link.download = `${document.getElementById('storeName').value}_운영현황.png`;
+                link.download = `${document.getElementById('storeName').value}_현황.png`;
                 link.href = canvas.toDataURL();
                 link.click();
             });
